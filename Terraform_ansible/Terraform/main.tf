@@ -44,7 +44,7 @@ EOF
 
 resource "aws_key_pair" "wendyam_junior-key" {
   key_name   = "wendyam_junior-key"
-  public_key = file("C:/Users/xyzkj/Claude/aws-cli-v1/Terraform/wendyam_junior-key.pub")
+  public_key = file("C:/Users/xyzkj/Claude/aws-cli-v1/Terraform_ansible/Terraform/wendyam_junior-key.pub")
 }
 
 resource "aws_subnet" "wendyam_junior-subnet" {
