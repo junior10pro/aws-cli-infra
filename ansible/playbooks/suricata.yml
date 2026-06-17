@@ -1,0 +1,7 @@
+---
+# Playbook autonome : (ré)installe/reconfigure Suricata uniquement
+- name: Installer et configurer Suricata
+  hosts: sonde
+  become: true
+  roles:
+    - suricata

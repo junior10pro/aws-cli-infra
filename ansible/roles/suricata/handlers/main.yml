@@ -1,0 +1,5 @@
+---
+- name: Redémarrer Suricata
+  ansible.builtin.systemd:
+    name: suricata
+    state: restarted

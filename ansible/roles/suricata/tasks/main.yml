@@ -1,0 +1,62 @@
+---
+- name: Installer les dépendances préalables
+  ansible.builtin.apt:
+    name:
+      - software-properties-common
+      - curl
+    state: present
+    update_cache: true
+
+- name: Ajouter le dépôt PPA OISF (Suricata stable)
+  ansible.builtin.apt_repository:
+    repo: ppa:oisf/suricata-stable
+    state: present
+    update_cache: true
+
+- name: Installer Suricata
+  ansible.builtin.apt:
+    name: suricata
+    state: present
+
+- name: Mettre à jour les règles Suricata (suricata-update)
+  ansible.builtin.command:
+    cmd: suricata-update
+  register: update_result
+  changed_when: "'Updated' in update_result.stdout or update_result.rc == 0"
+
+- name: Déployer la règle personnalisée TD2
+  ansible.builtin.template:
+    src: suricata_td2.rules.j2
+    dest: /var/lib/suricata/rules/suricata_td2.rules
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Redémarrer Suricata
+
+- name: Inclure la règle TD2 dans la configuration Suricata
+  ansible.builtin.lineinfile:
+    path: /etc/suricata/suricata.yaml
+    regexp: '^\s*- /var/lib/suricata/rules/suricata_td2.rules'
+    insertafter: 'rule-files:'
+    line: "  - /var/lib/suricata/rules/suricata_td2.rules"
+    state: present
+  notify: Redémarrer Suricata
+
+- name: Activer et démarrer Suricata
+  ansible.builtin.systemd:
+    name: suricata
+    enabled: true
+    state: started
+
+- name: Forcer le rechargement si des handlers sont en attente
+  ansible.builtin.meta: flush_handlers
+
+- name: Vérifier que Suricata est actif
+  ansible.builtin.systemd:
+    name: suricata
+  register: suricata_status
+
+- name: Echouer si Suricata n'est pas en cours d'exécution
+  ansible.builtin.fail:
+    msg: "Suricata n'est pas actif : {{ suricata_status.status.ActiveState }}"
+  when: suricata_status.status.ActiveState != "active"

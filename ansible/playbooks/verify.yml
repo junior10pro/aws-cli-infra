@@ -1,0 +1,52 @@
+---
+# Génère du trafic ICMP depuis le bastion vers la sonde,
+# puis vérifie que Suricata a bien enregistré une alerte TD2.
+
+- name: Récupérer l'IP privée de la sonde
+  hosts: sonde
+  gather_facts: true
+  tasks:
+    - name: Stocker l'IP privée de la sonde
+      ansible.builtin.set_fact:
+        sonde_private_ip: "{{ ansible_default_ipv4.address }}"
+
+- name: Générer du trafic ICMP depuis le bastion
+  hosts: bastion
+  gather_facts: false
+  tasks:
+    - name: Ping la sonde (5 paquets ICMP)
+      ansible.builtin.command:
+        cmd: "ping -c 5 {{ hostvars['sonde']['sonde_private_ip'] }}"
+      register: ping_result
+      changed_when: false
+
+    - name: Afficher le résultat du ping
+      ansible.builtin.debug:
+        msg: "{{ ping_result.stdout_lines }}"
+
+- name: Vérifier les alertes Suricata sur la sonde
+  hosts: sonde
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Attendre que des alertes apparaissent dans eve.json (10 s)
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Lire les alertes TD2 dans eve.json
+      ansible.builtin.shell:
+        cmd: "grep -c 'TD2' /var/log/suricata/eve.json || true"
+      register: alert_count
+      changed_when: false
+
+    - name: Afficher le nombre d'alertes détectées
+      ansible.builtin.debug:
+        msg: "Alertes 'TD2 ICMP detecte' trouvées : {{ alert_count.stdout }}"
+
+    - name: Echouer si aucune alerte n'est détectée
+      ansible.builtin.fail:
+        msg: >
+          Aucune alerte Suricata détectée. Vérifiez que Suricata tourne
+          (systemctl status suricata) et que la règle TD2 est chargée
+          (/var/lib/suricata/rules/suricata.rules).
+      when: alert_count.stdout | int == 0

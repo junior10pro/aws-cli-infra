@@ -1,0 +1,25 @@
+---
+# Point d'entrée principal — installe tous les composants
+- name: Attendre la disponibilité SSH du bastion
+  hosts: bastion
+  gather_facts: false
+  tasks:
+    - name: Attendre SSH
+      ansible.builtin.wait_for_connection:
+        timeout: 180
+        sleep: 10
+
+- name: Attendre la disponibilité SSH de la sonde
+  hosts: sonde
+  gather_facts: false
+  tasks:
+    - name: Attendre SSH
+      ansible.builtin.wait_for_connection:
+        timeout: 180
+        sleep: 10
+
+- name: Installer et configurer Suricata sur la sonde
+  hosts: sonde
+  become: true
+  roles:
+    - suricata
