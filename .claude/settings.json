@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh-keygen -y -f \"c:/MASTER2/CLOUD/AWS/infra3/td2-99-key.pem\")",
+      "Bash(aws ec2 *)"
+    ]
+  }
+}
