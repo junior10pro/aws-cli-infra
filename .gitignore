@@ -1,0 +1,20 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# TP_Jr_1
+TP_Jr_1/.td_ids
+*.pem
+*-key
+*-key.pub
+
+# Python
+.venv/
+__pycache__/
+
+# SSH keys
+*.pem
+*-key
+*-key.pub

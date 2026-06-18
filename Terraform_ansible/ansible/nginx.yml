@@ -1,0 +1,37 @@
+----
+- name: Install and configure Nginx
+  hosts: web
+  become: yes  
+
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start and enable Nginx service
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Copy Nginx configuration file
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify:
+        - Reload Nginx
+    - name: Déployer la page web
+      template:
+        src: index.html.j2
+        dest: /var/www/html/index.html
+        mode: '0644'
+      notify:
+        - Reload Nginx
+
+  handlers:
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
