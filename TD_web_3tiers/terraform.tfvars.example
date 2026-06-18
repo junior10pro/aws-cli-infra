@@ -1,0 +1,26 @@
+# Modele de configuration — copier vers terraform.tfvars et renseigner vos valeurs.
+# terraform.tfvars est ignore par git (voir .gitignore) car il contient des
+# identifiants de votre infrastructure.
+
+aws_region = "eu-west-3"
+azs        = ["eu-west-3a", "eu-west-3b"]
+
+# VPC existant (ne pas creer) — fournir son ID
+existing_vpc_id = "vpc-xxxxxxxxxxxxxxxxx"
+
+# Subnets a creer dans le VPC existant.
+# Verifier l'absence de chevauchement avec les subnets deja presents :
+#   aws ec2 describe-subnets --filters "Name=vpc-id,Values=<vpc-id>"
+public_subnet_cidrs = ["172.31.120.0/24", "172.31.121.0/24"]
+web_subnet_cidrs    = ["172.31.130.0/24", "172.31.131.0/24"]
+app_subnet_cidrs    = ["172.31.140.0/24", "172.31.141.0/24"]
+data_subnet_cidrs   = ["172.31.150.0/24", "172.31.151.0/24"]
+
+# RDS PostgreSQL existant (ne pas creer) — fournir son identifiant
+existing_db_identifier = "mon-instance-rds"
+db_name                = "mydb"
+db_username            = "monutilisateur"
+
+# db_password : NE PAS METTRE ICI — passer via la variable d'environnement :
+#   $env:TF_VAR_db_password="VotreMotDePasse"   (PowerShell)
+#   export TF_VAR_db_password="VotreMotDePasse" (Bash)

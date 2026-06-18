@@ -1,0 +1,21 @@
+# --- Terraform ---
+# Repertoire de travail local (contient le binaire du provider ~700 Mo)
+.terraform/
+
+# Fichiers d'etat : contiennent la topologie de l'infra et parfois des secrets
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Variables : contiennent des identifiants de l'infra (VPC, RDS, user)
+# -> ne pas versionner ; utiliser terraform.tfvars.example comme modele
+terraform.tfvars
+*.auto.tfvars
+
+# Le lock file, lui, DOIT etre versionne (on ne l'ignore pas)
+# .terraform.lock.hcl
+
+# --- Divers ---
+cred.ini
+*.env
