@@ -1,0 +1,6 @@
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+wendyam_junior-key
+wendyam_junior-key.pub
+*.tfvars.bak
